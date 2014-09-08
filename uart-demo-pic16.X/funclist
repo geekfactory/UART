@@ -1,0 +1,14 @@
+_uart_write: CODE, 1507 0 20
+_uart_control: CODE, 1693 0 77
+__stringtab: STRING, 2 0 6
+__stringdata: STRING, 8 0 23
+_uart_write_array: CODE, 1619 0 33
+_main: CODE, 1879 0 169
+_uart_read: CODE, 1527 0 21
+_uart_init: CODE, 1548 0 22
+_uart_available: CODE, 1570 0 24
+__initialization: CODE, 1504 0 0
+___lldiv: CODE, 1770 0 109
+_uart_puts: CODE, 1652 0 41
+_uart_open: CODE, 1594 0 25
+Total: 570
