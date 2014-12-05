@@ -4,9 +4,10 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>C:/Users/Ruben/Dropbox/Electronics/MCULib/UART/UART.h</itemPath>
-      <itemPath>C:/Users/Ruben/Dropbox/Electronics/MCULib/UART/UARTPort.h</itemPath>
-      <itemPath>C:/Users/Ruben/Dropbox/Electronics/MCULib/UART/Compiler.h</itemPath>
+      <itemPath>../Compiler.h</itemPath>
+      <itemPath>../UART.h</itemPath>
+      <itemPath>../UARTPort.h</itemPath>
+      <itemPath>../../TimeLib/TimeLib.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -16,7 +17,9 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>main.c</itemPath>
-      <itemPath>C:/Users/Ruben/Dropbox/Electronics/MCULib/UART/UART-PIC16.c</itemPath>
+      <itemPath>../UART-BPIC16.c</itemPath>
+      <itemPath>../UART-PIC16.c</itemPath>
+      <itemPath>../../TimeLib/TimeLib.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -24,6 +27,10 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>..</Elem>
+    <Elem>../../TimeLib</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">
@@ -34,7 +41,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC8</languageToolchain>
-        <languageToolchainVersion>1.12</languageToolchainVersion>
+        <languageToolchainVersion>1.33</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
@@ -42,8 +49,11 @@
           <linkerLibItems>
           </linkerLibItems>
         </linkerTool>
+        <archiverTool>
+        </archiverTool>
         <loading>
           <useAlternateLoadableFile>false</useAlternateLoadableFile>
+          <parseOnProdLoad>false</parseOnProdLoad>
           <alternateLoadableFile></alternateLoadableFile>
         </loading>
       </compileType>
@@ -118,6 +128,12 @@
       <PICkit3PlatformTool>
       </PICkit3PlatformTool>
       <XC8-config-global>
+        <property key="advanced-elf" value="true"/>
+        <property key="output-file-format" value="-mcof,+elf"/>
+        <property key="stack-size-high" value="auto"/>
+        <property key="stack-size-low" value="auto"/>
+        <property key="stack-size-main" value="auto"/>
+        <property key="stack-type" value="compiled"/>
       </XC8-config-global>
     </conf>
   </confs>

@@ -5,16 +5,18 @@
  */
 
 #include "UART.h"
-#include "../FIFO/FIFO.h"
 
-uint8_t rxbuf[50];
-uint8_t txbuf[20];
 
-struct xFIFOStruct rxfifodata;
-struct xFIFOStruct txfifodata;
+uint8_t txbuf[CONFIG_UART_TXBUF_LEN];
+uint8_t rxbuf[CONFIG_UART_RXBUF_LEN];
 
-xFIFOHandle rxfifo;
-xFIFOHandle txfifo;
+uint8_t tx_read_offset;
+uint8_t tx_write_offset;
+uint8_t txcount;
+
+uint8_t rx_read_offset;
+uint8_t rx_write_offset;
+uint8_t rxcount;
 
 volatile BOOL txbussy = FALSE;
 
@@ -38,8 +40,8 @@ xUARTHandle uart_init(enum enUARTModules eUART)
 	// Clear ongoing TX flag
 	txbussy = FALSE;
 	// Create buffers
-	rxfifo = fifo_create_static(&rxfifodata, rxbuf, sizeof(rxbuf), sizeof(uint8_t));
-	txfifo = fifo_create_static(&txfifodata, txbuf, sizeof(txbuf), sizeof(uint8_t));
+	tx_read_offset = 0;
+	tx_write_offset = 0;
 	// Return module identifier
 	return eUART;
 }
@@ -62,7 +64,7 @@ int uart_control(xUARTHandle uartd, uint32_t ctrl, uint32_t arg)
 		TXSTAbits.TX9 = 0;
 	}
 	// Calculate baudrate
-	SPBRG = ((uint32_t) 2000000 / (4 * (uint32_t) arg)) - 1;
+	SPBRG = ((uint32_t) CONFIG_TIMING_MAIN_CLOCK / (4 * (uint32_t) arg)) - 1;
 
 	return 0;
 }
@@ -71,16 +73,16 @@ BOOL uart_open(xUARTHandle uartd)
 {
 	if (uartd != 1)
 		return FALSE;
-
+	// Clear interrupt flags
 	PIR1bits.RCIF = 0;
 	PIR1bits.TXIF = 0;
 	txbussy = FALSE;
-
+	// Async mode enabled, enable serial port
 	TXSTAbits.SYNC = 0;
 	RCSTAbits.SPEN = 1;
 	//TXSTAbits.TXEN = 1;
 	RCSTAbits.CREN = 1;
-
+	// Enable receive and transmit interrupts
 	PIE1bits.RCIE = 1;
 	PIE1bits.TXIE = 1;
 
@@ -110,8 +112,14 @@ void uart_write(xUARTHandle uartd, uint8_t data)
 		return;
 	// Disable interrupts
 	di();
-	// Add to TX fifo
-	fifo_add(txfifo, (void*) &data);
+	// Add to TX fifo //fifo_add(txfifo, (void*) &data);
+	// wait while buffer is full
+	while (txcount == CONFIG_UART_TXBUF_LEN);
+	txbuf[tx_write_offset++] = data;
+	if (tx_write_offset >= CONFIG_UART_TXBUF_LEN) {
+		tx_write_offset = 0;
+		txcount++;
+	}
 	// Enable TX (causes interrupt)
 	if (txbussy == FALSE) {
 		txbussy = TRUE;
@@ -139,11 +147,16 @@ uint8_t uart_read(xUARTHandle uartd)
 {
 	uint8_t rxdata;
 
+	// Wait for data to become available
 	while (!uart_available(uartd));
 
 	di();
-	if (!fifo_get(rxfifo, &rxdata))
-		rxdata = 0;
+	//fifo_get(rxfifo, &rxdata);
+	rxdata = rxbuf[rx_read_offset++];
+	if (rx_read_offset >= CONFIG_UART_RXBUF_LEN) {
+		rx_read_offset = 0;
+		rxcount--;
+	}
 	ei();
 
 	return rxdata;
@@ -200,7 +213,7 @@ BOOL uart_available(xUARTHandle uartd)
 	BOOL ret;
 
 	di();
-	if (!fifo_empty(rxfifo))
+	if (rxcount != 0)
 		ret = TRUE;
 	else
 		ret = FALSE;

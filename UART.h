@@ -51,6 +51,13 @@
 #define UART_FLOW_CONTROL_RTS		0x00030000
 #define UART_FLOW_CONTROL_RTS_CTS	0x00040000
 
+#if !defined(CONFIG_UART_TXBUF_LEN)
+#define CONFIG_UART_TXBUF_LEN   20
+#endif
+#if !defined(CONFIG_UART_RXBUF_LEN)
+#define CONFIG_UART_RXBUF_LEN   20
+#endif
+
 /*-------------------------------------------------------------*/
 /*		Typedefs enums & structs			*/
 /*-------------------------------------------------------------*/
